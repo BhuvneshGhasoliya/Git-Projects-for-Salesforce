@@ -1,0 +1,257 @@
+/* Card wrapper */
+:host {
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Table reset */
+.emp-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 6px;
+    padding: 0 16px;
+}
+
+/* Header row */
+.emp-table thead tr {
+    background: transparent;
+}
+
+.table-wrapper {
+    max-height: 500px;      /* adjust height as needed */
+    overflow-y: auto;
+    border-radius: 8px;
+}
+
+.emp-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #ffffff;
+}
+
+
+.emp-table thead th {
+    position: sticky;
+    top: 0;
+    background: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 2px solid #e8e8e8;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+}
+
+.emp-table thead th:hover {
+    color: #0070d2;
+}
+
+.emp-table thead th i {
+    color: #aaa;
+    font-size: 11px;
+}
+
+/* Body rows */
+.emp-table tbody tr {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    transition: box-shadow 0.2s ease;
+}
+
+.emp-table tbody tr:hover {
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.emp-table tbody td {
+    padding: 10px 14px;
+    font-size: 13.5px;
+    color: #222;
+    border-top: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+.emp-table tbody td:first-child {
+    border-left: 1px solid #f0f0f0;
+    border-radius: 10px 0 0 10px;
+}
+
+.emp-table tbody td:last-child {
+    border-right: 1px solid #f0f0f0;
+    border-radius: 0 10px 10px 0;
+}
+
+/* Read-only text */
+.cell-text {
+    display: block;
+    padding: 2px 0;
+}
+
+/* Input fields (edit mode) */
+.emp-table input[type="text"] {
+    width: 100%;
+    padding: 7px 12px;
+    border: 1.5px solid #d0d0d0;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #222;
+    background: #fafafa;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.emp-table input[type="text"]:focus {
+    border-color: #0070d2;
+    background: #fff;
+}
+
+/* Select / Picklist dropdown */
+.emp-table select {
+    width: 100%;
+    padding: 7px 12px;
+    border: 1.5px solid #d0d0d0;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #222;
+    background: #fafafa;
+    outline: none;
+    cursor: pointer;
+    appearance: auto;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.emp-table select:focus {
+    border-color: #0070d2;
+    background: #fff;
+}
+
+/* Status badge */
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.status-active {
+    background: #e6f4ea;
+    color: #2d7a3a;
+}
+
+.status-inactive {
+    background: #f0f0f0;
+    color: #666;
+}
+
+/* Action icons */
+.icon-pencil {
+    color: #aaa;
+    font-size: 14px;
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 4px;
+}
+
+.icon-pencil:hover {
+    color: #0070d2;
+}
+
+.icon-save {
+    color: #2d7a3a;
+    font-size: 15px;
+    cursor: pointer;
+    margin-right: 8px;
+    transition: color 0.2s;
+}
+
+.icon-save:hover {
+    color: #1a5c28;
+}
+
+.icon-cancel {
+    color: #c0392b;
+    font-size: 15px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.icon-cancel:hover {
+    color: #922b21;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-top: 1px solid #e8e8e8;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.page-info {
+    font-size: 13px;
+    color: #666;
+}
+
+.page-buttons {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.page-btn {
+    min-width: 34px;
+    height: 34px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fff;
+    color: #444;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    padding: 0 10px;
+}
+
+.page-btn:hover:not(:disabled) {
+    border-color: #0070d2;
+    color: #0070d2;
+}
+
+.page-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.page-btn-active {
+    background: #0070d2;
+    border-color: #0070d2;
+    color: #fff !important;
+    font-weight: 600;
+}
+
+/* Page size selector */
+.page-size {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #666;
+}
+
+.page-size select {
+    padding: 6px 10px;
+    border: 1.5px solid #d0d0d0;
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+}

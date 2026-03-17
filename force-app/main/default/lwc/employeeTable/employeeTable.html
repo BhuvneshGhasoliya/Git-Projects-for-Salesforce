@@ -1,0 +1,134 @@
+<template>
+    <lightning-card title="Employee Table">
+
+        <div class="table-wrapper">
+            <table class="emp-table">
+
+                <thead>
+                    <tr>
+                        <template for:each={fields} for:item="field">
+                            <th key={field.apiName} onclick={handleSort} data-field={field.apiName}>
+                                {field.label}
+                                <i class={field.sortIcon} style="margin-left:5px;"></i>
+                            </th>
+                        </template>
+                        <th>Edit</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <template if:true={isLoading}>
+                        <tr>
+                            <td colspan="10" style="text-align:center; padding:20px;">
+                                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                            </td>
+                        </tr>
+                    </template>
+
+                    <template if:false={isLoading}>
+                        <template for:each={processedRecords} for:item="emp">
+                            <tr key={emp.Id}>
+                                <template for:each={emp.values} for:item="val">
+                                    <td key={val.key}>
+                                        <template if:true={val.isPicklist}>
+                                            <template if:true={emp.isEditing}>
+                                                <select data-id={emp.Id} data-field={val.key} onchange={handleFieldChange}>
+                                                    <template for:each={val.picklistValues} for:item="opt">
+                                                        <option key={opt} value={opt}>{opt}</option>
+                                                    </template>
+                                                </select>
+                                            </template>
+                                            <template if:false={emp.isEditing}>
+                                                <template if:true={val.isStatus}>
+                                                    <span class={val.statusClass}>{val.value}</span>
+                                                </template>
+                                                <template if:false={val.isStatus}>
+                                                    <span class="cell-text">{val.value}</span>
+                                                </template>
+                                            </template>
+                                        </template>
+                                        <template if:false={val.isPicklist}>
+                                            <template if:true={emp.isEditing}>
+                                                <input type="text" value={val.value}
+                                                       data-id={emp.Id} data-field={val.key}
+                                                       onchange={handleFieldChange} />
+                                            </template>
+                                            <template if:false={emp.isEditing}>
+                                                <span class="cell-text">{val.value}</span>
+                                            </template>
+                                        </template>
+                                    </td>
+                                </template>
+                                <td>
+                                    <template if:false={emp.isEditing}>
+                                        <i class="fa fa-pencil icon-pencil" data-id={emp.Id} onclick={handleEdit}></i>
+                                    </template>
+                                    <template if:true={emp.isEditing}>
+                                        <i class="fa fa-check icon-save" data-id={emp.Id} onclick={handleSave}></i>
+                                        <i class="fa fa-times icon-cancel" data-id={emp.Id} onclick={handleCancel}></i>
+                                    </template>
+                                </td>
+                            </tr>
+                        </template>
+                    </template>
+                </tbody>
+
+            </table>
+        </div>
+
+        <!-- ── Pagination Controls ── -->
+        <div class="pagination">
+
+            <span class="page-info">
+                Showing {startRecord}–{endRecord} of {totalCount} records
+            </span>
+
+            <div class="page-buttons">
+
+                <!-- First -->
+                <button class="page-btn" onclick={goToFirst} disabled={isFirstPage}>
+                    <i class="fa fa-angle-double-left"></i>
+                </button>
+
+                <!-- Prev -->
+                <button class="page-btn" onclick={goToPrev} disabled={isFirstPage}>
+                    <i class="fa fa-angle-left"></i>
+                </button>
+
+                <!-- Page numbers -->
+                <template for:each={pageNumbers} for:item="pg">
+                    <button key={pg.number}
+                            class={pg.cssClass}
+                            data-page={pg.number}
+                            onclick={goToPage}>
+                        {pg.number}
+                    </button>
+                </template>
+
+                <!-- Next -->
+                <button class="page-btn" onclick={goToNext} disabled={isLastPage}>
+                    <i class="fa fa-angle-right"></i>
+                </button>
+
+                <!-- Last -->
+                <button class="page-btn" onclick={goToLast} disabled={isLastPage}>
+                    <i class="fa fa-angle-double-right"></i>
+                </button>
+
+            </div>
+
+            <!-- Page size selector -->
+            <div class="page-size">
+                <label>Rows per page:</label>
+                <select onchange={handlePageSizeChange}>
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+
+        </div>
+
+    </lightning-card>
+</template>
