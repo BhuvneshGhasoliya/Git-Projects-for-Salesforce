@@ -1,0 +1,135 @@
+<template>
+    <div class="cinema-app">
+
+        <!-- HEADER (existing + new buttons added) -->
+        <div class="header">
+            <div class="logo">🎬 CineSearch</div>
+            <div class="header-right">
+                <div class="search-bar">
+                    <input
+                        class="search-input"
+                        type="text"
+                        placeholder="Search any movie..."
+                        onchange={handleChange}
+                    />
+                    <button class="search-btn" onclick={handleSearch}>Search</button>
+                </div>
+                <!-- NEW -->
+                <button class="add-btn" onclick={handleOpenAddForm}>+ Add Movie</button>
+                <button class="saved-btn" onclick={handleViewSaved}>📁 Saved</button>
+            </div>
+        </div>
+
+        <!-- NEW: Success Toast -->
+        <template if:true={saveSuccess}>
+            <div class="toast">✅ Movie saved to Salesforce!</div>
+        </template>
+
+        <!-- EXISTING: GRID VIEW (default or search results) -->
+        <template if:false={isDetail}>
+            <template if:false={isAddForm}>
+                <template if:false={isSaved}>
+
+                    <div class="section-title">
+                        <template if:true={isDefault}>🦇 Batman Collection</template>
+                        <template if:true={isResults}>Results for "{keyword}"</template>
+                    </div>
+
+                    <div class="movie-grid">
+                        <template for:each={activeList} for:item="movie">
+                            <div
+                                key={movie.imdbID}
+                                class="movie-card"
+                                data-id={movie.imdbID}
+                                onclick={handleCardClick}
+                            >
+                                <div class="poster-wrap">
+                                    <img class="poster" src={movie.Poster} alt={movie.Title} />
+                                    <div class="overlay">
+                                        <span class="view-label">View Details</span>
+                                    </div>
+                                </div>
+                                <div class="card-info">
+                                    <div class="card-title">{movie.Title}</div>
+                                    <div class="card-year">{movie.Year}</div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                </template>
+            </template>
+        </template>
+
+        <!-- EXISTING: DETAIL VIEW + NEW save button -->
+        <template if:true={isDetail}>
+            <button class="back-btn" onclick={handleBack}>← Back</button>
+
+            <div class="detail-view">
+                <img class="detail-poster" src={movieData.Poster} alt={movieData.Title} />
+                <div class="detail-info">
+                    <div class="detail-title">{movieData.Title}</div>
+                    <div class="detail-meta">
+                        <span class="badge">{movieData.Year}</span>
+                        <span class="badge rating">⭐ {movieData.imdbRating}</span>
+                    </div>
+                    <div class="detail-genre">{movieData.Genre}</div>
+                    <p class="detail-plot">{movieData.Plot}</p>
+                    <div class="detail-actors">
+                        <span class="label">Cast</span>
+                        {movieData.Actors}
+                    </div>
+                    <!-- NEW -->
+                    <button class="save-btn" onclick={handleSaveCurrentMovie}>
+                        💾 Save to Salesforce
+                    </button>
+                </div>
+            </div>
+        </template>
+
+        <!-- NEW: MANUAL ADD FORM -->
+        <template if:true={isAddForm}>
+            <button class="back-btn" onclick={handleBack}>← Back</button>
+            <div class="add-form">
+                <div class="form-title">Add a Custom Movie</div>
+                <input class="form-input" type="text" placeholder="Title"        data-field="title"      onchange={handleFormChange} />
+                <input class="form-input" type="text" placeholder="Year"         data-field="year"       onchange={handleFormChange} />
+                <input class="form-input" type="text" placeholder="Genre"        data-field="genre"      onchange={handleFormChange} />
+                <input class="form-input" type="text" placeholder="Actors"       data-field="actors"     onchange={handleFormChange} />
+                <textarea               class="form-input" placeholder="Plot"    data-field="plot"       onchange={handleFormChange}></textarea>
+                <input class="form-input" type="text" placeholder="Poster URL"   data-field="poster"     onchange={handleFormChange} />
+                <input class="form-input" type="text" placeholder="IMDB Rating"  data-field="imdbRating" onchange={handleFormChange} />
+                <button class="search-btn" onclick={handleFormSubmit}>Save Movie</button>
+            </div>
+        </template>
+
+        <!-- NEW: SAVED MOVIES VIEW -->
+        <template if:true={isSaved}>
+            <button class="back-btn" onclick={handleBack}>← Back</button>
+            <div class="section-title">📁 My Saved Movies</div>
+
+            <template if:false={hasSaved}>
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <div class="empty-title">No saved movies yet</div>
+                    <div class="empty-sub">Save movies from search or add them manually</div>
+                </div>
+            </template>
+
+            <div class="movie-grid">
+                <template for:each={savedMovies} for:item="movie">
+                    <div key={movie.Id} class="movie-card">
+                        <div class="poster-wrap">
+                            <img class="poster" src={movie.Poster__c} alt={movie.Title__c} />
+                        </div>
+                        <div class="card-info">
+                            <div class="card-title">{movie.Title__c}</div>
+                            <div class="card-year">{movie.Year__c}</div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+    </div>
+</template>
