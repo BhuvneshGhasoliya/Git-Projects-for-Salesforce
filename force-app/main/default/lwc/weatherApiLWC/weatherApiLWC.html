@@ -1,0 +1,133 @@
+<template>
+    <div class="gw-shell">
+
+        <!-- Header -->
+        <header class="gw-header">
+            <div class="gw-header__icon">🌡</div>
+            <div>
+                <h1 class="gw-title">Global Temperature Monitor</h1>
+                <p class="gw-subtitle">Historical land &amp; station anomalies since 1880</p>
+            </div>
+            <button class="gw-refresh-btn" onclick={loadData} title="Refresh data">
+                <span class={refreshIconClass}>↻</span>
+            </button>
+        </header>
+
+        <!-- Error Banner -->
+        <template if:true={error}>
+            <div class="gw-error">
+                <span>⚠ {error}</span>
+                <button onclick={loadData}>Retry</button>
+            </div>
+        </template>
+
+        <!-- Loading Skeleton -->
+        <template if:true={isLoading}>
+            <div class="gw-skeleton-grid">
+                <div class="gw-skeleton-card"></div>
+                <div class="gw-skeleton-card"></div>
+                <div class="gw-skeleton-card"></div>
+                <div class="gw-skeleton-card"></div>
+            </div>
+        </template>
+
+        <!-- Content -->
+        <template if:true={hasData}>
+
+            <!-- KPI Strip -->
+            <div class="gw-kpi-strip">
+                <div class="gw-kpi">
+                    <span class="gw-kpi__value">{totalRecords}</span>
+                    <span class="gw-kpi__label">Records</span>
+                </div>
+                <div class="gw-kpi gw-kpi--accent">
+                    <span class="gw-kpi__value">{latestLand}°</span>
+                    <span class="gw-kpi__label">Latest Land Δ</span>
+                </div>
+                <div class="gw-kpi gw-kpi--warm">
+                    <span class="gw-kpi__value">{latestStation}°</span>
+                    <span class="gw-kpi__label">Latest Station Δ</span>
+                </div>
+                <div class="gw-kpi">
+                    <span class="gw-kpi__value">{yearRange}</span>
+                    <span class="gw-kpi__label">Year Span</span>
+                </div>
+            </div>
+
+            <!-- Filters + Search -->
+            <div class="gw-controls">
+                <div class="gw-search-wrap">
+                    <span class="gw-search-icon">🔍</span>
+                    <input
+                        type="text"
+                        class="gw-search"
+                        placeholder="Filter by year (e.g. 1995)…"
+                        value={searchTerm}
+                        onchange={handleSearch}
+                    />
+                </div>
+                <div class="gw-filter-group">
+                    <button
+                        class={btnClassAll}
+                        data-filter="all"
+                        onclick={handleFilter}>All</button>
+                    <button
+                        class={btnClassPositive}
+                        data-filter="positive"
+                        onclick={handleFilter}>Warming ↑</button>
+                    <button
+                        class={btnClassNegative}
+                        data-filter="negative"
+                        onclick={handleFilter}>Cooling ↓</button>
+                </div>
+                <span class="gw-count">{filteredCount} results</span>
+            </div>
+
+            <!-- Data Table -->
+            <div class="gw-table-wrap">
+                <table class="gw-table">
+                    <thead>
+                        <tr>
+                            <th onclick={sortBy} data-col="timeVal" class="sortable">
+                                Year {sortArrow}
+                            </th>
+                            <th onclick={sortBy} data-col="station" class="sortable">
+                                Station Δ (°C)
+                            </th>
+                            <th onclick={sortBy} data-col="land" class="sortable">
+                                Land Δ (°C)
+                            </th>
+                            <th>Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={paginatedRecords} for:item="row">
+                            <tr key={row.time} class={row.rowClass}>
+                                <td class="gw-td--year">{row.displayYear}</td>
+                                <td class={row.stationClass}>{row.station}</td>
+                                <td class={row.landClass}>{row.land}</td>
+                                <td>
+                                    <div class="gw-bar-wrap">
+                                        <div class="gw-bar" style={row.barStyle}></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+
+                <template if:false={hasFilteredData}>
+                    <div class="gw-empty">No records match your filter.</div>
+                </template>
+            </div>
+
+            <!-- Pagination -->
+            <div class="gw-pagination">
+                <button onclick={prevPage} disabled={isFirstPage}>‹ Prev</button>
+                <span class="gw-page-info">Page {currentPage} of {totalPages}</span>
+                <button onclick={nextPage} disabled={isLastPage}>Next ›</button>
+            </div>
+
+        </template>
+    </div>
+</template>
