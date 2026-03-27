@@ -1,0 +1,85 @@
+<template>
+<lightning-card title="🍽️ Recipe Explorer">
+
+    <!-- 🔍 Search -->
+    <div class="slds-p-around_medium">
+        <lightning-input 
+            type="text" 
+            label="Search Recipe"
+            onchange={handleSearch}>
+        </lightning-input>
+    </div>
+
+    <!-- 📦 Cards -->
+    <div class="container">
+        <template for:each={visibleRecipes} for:item="rec">
+            <div key={rec.id} class="card">
+                <img src={rec.image} class="img"/>
+                <h2>{rec.title}</h2>
+
+                <p>⏱ {rec.readyInMinutes} min</p>
+                <p>👥 {rec.servings} servings</p>
+
+                <!-- <a href={rec.sourceUrl} target="_blank">View Recipe</a> -->
+                <lightning-button 
+label="View Recipe" 
+onclick={viewRecipe}
+data-id={rec.id}>
+</lightning-button>
+            </div>
+        </template>
+    </div>
+
+    <!-- 🔄 Pagination -->
+    <div class="slds-p-around_medium slds-align_absolute-center">
+        <lightning-button label="Previous" onclick={prevPage}></lightning-button>
+        <lightning-button label="Next" onclick={nextPage} class="slds-m-left_small"></lightning-button>
+    </div>
+
+</lightning-card>
+<template if:true={selectedRecipe}>
+<section role="dialog" class="slds-modal slds-fade-in-open">
+    <div class="slds-modal__container">
+
+        <!-- Header -->
+        <header class="slds-modal__header">
+            <lightning-button-icon 
+                icon-name="utility:close"
+                alternative-text="Close"
+                onclick={closeModal}
+                class="slds-modal__close">
+            </lightning-button-icon>
+
+            <h2 class="slds-text-heading_medium">
+                {selectedRecipe.title}
+            </h2>
+        </header>
+
+        <!-- Body -->
+        <div class="slds-modal__content slds-p-around_medium">
+
+            <img src={selectedRecipe.image} width="100%" />
+
+            <p class="slds-m-top_small">
+                ⏱ {selectedRecipe.readyInMinutes} min  
+                | 👥 {selectedRecipe.servings}
+            </p>
+
+            <lightning-formatted-rich-text 
+                value={selectedRecipe.summary}>
+            </lightning-formatted-rich-text>
+
+        </div>
+
+        <!-- Footer -->
+        <footer class="slds-modal__footer">
+            <lightning-button label="Close" onclick={closeModal}></lightning-button>
+        </footer>
+
+    </div>
+</section>
+
+<!-- Backdrop -->
+<div class="slds-backdrop slds-backdrop_open"></div>
+</template>
+</template>
