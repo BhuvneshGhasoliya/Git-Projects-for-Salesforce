@@ -1,47 +1,238 @@
 <template>
-    <lightning-card title="Anime Search">
-
-        <div class="slds-p-around_medium">
-            <lightning-input 
-                label="Search Anime"
-                value={searchKey}
-                onchange={handleChange}>
-            </lightning-input>
-
-            <lightning-button 
-                label="Search"
-                onclick={handleSearch}
-                class="slds-m-top_small">
-            </lightning-button>
+    <lightning-card>
+        <div class="card-header" slot="title">
+            <span class="title-text">🎌 Anime Explorer</span>
         </div>
 
-        <!-- GRID UI -->
-        <div class="slds-grid slds-wrap slds-p-around_medium">
+        <!-- Tabs -->
+        <div class="slds-p-horizontal_medium">
+            <div class="tab-bar">
+                <button
+                    class={searchTabClass}
+                    onclick={handleTabSearch}>
+                    Search
+                </button>
+                <button
+                    class={topTabClass}
+                    onclick={handleTabTop}>
+                    Top Anime
+                </button>
+            </div>
+        </div>
 
-            <template for:each={animeList} for:item="anime">
-                <div key={anime.id} 
-                     class="slds-col slds-size_1-of-2 slds-p-around_small">
+        <!-- Search Bar (only on Search tab) -->
+        <template if:true={isSearchTab}>
+            <div class="slds-p-horizontal_medium slds-p-top_small">
+                <div class="search-row">
+                    <lightning-input
+                        label=""
+                        placeholder="Search by title, e.g. Naruto, One Piece..."
+                        value={searchKey}
+                        onchange={handleChange}
+                        onkeyup={handleKeyUp}
+                        class="search-input">
+                    </lightning-input>
+                    <lightning-button
+                        label="Search"
+                        variant="brand"
+                        onclick={handleSearch}
+                        disabled={isLoading}
+                        class="search-btn">
+                    </lightning-button>
+                </div>
+            </div>
+        </template>
 
-                    <div class="slds-box">
+        <!-- Error -->
+        <template if:true={hasError}>
+            <div class="slds-p-horizontal_medium slds-p-top_small">
+                <div class="error-box">
+                    ⚠️ {errorMessage}
+                </div>
+            </div>
+        </template>
 
-                        <img src={anime.image} width="100%" />
+        <!-- Loading Spinner -->
+        <template if:true={isLoading}>
+            <div class="loading-container">
+                <lightning-spinner
+                    alternative-text="Loading"
+                    size="medium">
+                </lightning-spinner>
+                <p class="loading-text">Fetching anime data...</p>
+            </div>
+        </template>
 
-                        <h3><b>{anime.title}</b></h3>
+        <!-- Stats Bar -->
+        <template if:true={showResults}>
+            <div class="slds-p-horizontal_medium slds-p-top_small stats-bar">
+                <span class="result-count">{resultSummary}</span>
+                <div class="sort-row">
+                    <label class="sort-label">Sort:</label>
+                    <select class="sort-select" onchange={handleSortChange}>
+                        <option value="score">Score</option>
+                        <option value="rank">Rank</option>
+                        <option value="title">Title</option>
+                        <option value="episodes">Episodes</option>
+                    </select>
+                </div>
+            </div>
+        </template>
 
-                        <p>⭐ {anime.score}</p>
-                        <p>🎬 Episodes: {anime.episodes}</p>
-                        <p>Status: {anime.status}</p>
+        <!-- Anime Grid -->
+        <template if:true={showResults}>
+            <div class="slds-p-around_medium anime-grid">
+                <template for:each={displayedAnime} for:item="anime">
+                    <div key={anime.mal_id}
+                         class="anime-card"
+                         onclick={handleCardClick}
+                         data-id={anime.mal_id}>
 
-                        <p class="slds-truncate">
-                            {anime.synopsis}
-                        </p>
+                        <div class="card-img-wrap">
+                            <template if:true={anime.image}>
+                                <img
+                                    src={anime.image}
+                                    alt={anime.title}
+                                    class="card-img"
+                                    loading="lazy" />
+                            </template>
+                            <template if:false={anime.image}>
+                                <div class="card-img-placeholder">?</div>
+                            </template>
 
+                            <template if:true={anime.score}>
+                                <div class="score-badge">★ {anime.score}</div>
+                            </template>
+                        </div>
+
+                        <div class="card-body">
+                            <p class="card-title">{anime.title}</p>
+                            <div class="badge-row">
+                                <template if:true={anime.type}>
+                                    <span class="badge badge-type">{anime.type}</span>
+                                </template>
+                                <template if:true={anime.statusLabel}>
+                                    <span class={anime.statusClass}>{anime.statusLabel}</span>
+                                </template>
+                            </div>
+                            <p class="card-eps">
+                                <template if:true={anime.episodes}>
+                                    {anime.episodes} eps
+                                </template>
+                                <template if:false={anime.episodes}>
+                                    ? eps
+                                </template>
+                            </p>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <!-- Empty State -->
+        <template if:true={showEmpty}>
+            <div class="empty-state">
+                <p>🔍 No results found. Try a different search term.</p>
+            </div>
+        </template>
+
+        <!-- Pagination -->
+        <template if:true={showPagination}>
+            <div class="pagination-bar slds-p-around_medium">
+                <lightning-button
+                    label="← Prev"
+                    onclick={handlePrevPage}
+                    disabled={isFirstPage}>
+                </lightning-button>
+                <span class="page-info">Page {currentPage} of {totalPages}</span>
+                <lightning-button
+                    label="Next →"
+                    onclick={handleNextPage}
+                    disabled={isLastPage}>
+                </lightning-button>
+            </div>
+        </template>
+
+        <!-- Detail Modal -->
+        <template if:true={showModal}>
+            <div class="modal-overlay" onclick={handleOverlayClick}>
+                <div class="modal-box">
+                    <button class="modal-close" onclick={closeModal}>✕</button>
+
+                    <div class="modal-hero">
+                        <template if:true={selectedAnime.imageLarge}>
+                            <img
+                                src={selectedAnime.imageLarge}
+                                alt={selectedAnime.title}
+                                class="modal-img" />
+                        </template>
+                        <template if:false={selectedAnime.imageLarge}>
+                            <div class="modal-img-placeholder">?</div>
+                        </template>
+
+                        <div class="modal-info">
+                            <h2 class="modal-title">{selectedAnime.title}</h2>
+                            <template if:true={selectedAnime.title_en}>
+                                <p class="modal-title-en">{selectedAnime.title_en}</p>
+                            </template>
+
+                            <div class="modal-tags">
+                                <template if:true={selectedAnime.type}>
+                                    <span class="badge badge-type">{selectedAnime.type}</span>
+                                </template>
+                                <template if:true={selectedAnime.statusLabel}>
+                                    <span class={selectedAnime.statusClass}>
+                                        {selectedAnime.statusLabel}
+                                    </span>
+                                </template>
+                                <template if:true={selectedAnime.score}>
+                                    <span class="badge badge-score">★ {selectedAnime.score}</span>
+                                </template>
+                            </div>
+
+                            <div class="modal-stats-grid">
+                                <div class="stat-item">
+                                    <div class="stat-label">Episodes</div>
+                                    <div class="stat-value">{selectedAnime.episodesDisplay}</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Rank</div>
+                                    <div class="stat-value">{selectedAnime.rankDisplay}</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Popularity</div>
+                                    <div class="stat-value">{selectedAnime.popularityDisplay}</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Members</div>
+                                    <div class="stat-value">{selectedAnime.membersDisplay}</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Duration</div>
+                                    <div class="stat-value">{selectedAnime.durationDisplay}</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Season</div>
+                                    <div class="stat-value">{selectedAnime.seasonDisplay}</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                </div>
-            </template>
+                    <template if:true={selectedAnime.genres}>
+                        <div class="modal-genres">
+                            <h3 class="section-label">Genres</h3>
+                            <p>{selectedAnime.genres}</p>
+                        </div>
+                    </template>
 
-        </div>
+                    <div class="modal-synopsis">
+                        <h3 class="section-label">Synopsis</h3>
+                        <p>{selectedAnime.synopsis}</p>
+                    </div>
+                </div>
+            </div>
+        </template>
 
     </lightning-card>
 </template>
