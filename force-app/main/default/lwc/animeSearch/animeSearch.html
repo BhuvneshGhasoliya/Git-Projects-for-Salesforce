@@ -1,0 +1,47 @@
+<template>
+    <lightning-card title="Anime Search">
+
+        <div class="slds-p-around_medium">
+            <lightning-input 
+                label="Search Anime"
+                value={searchKey}
+                onchange={handleChange}>
+            </lightning-input>
+
+            <lightning-button 
+                label="Search"
+                onclick={handleSearch}
+                class="slds-m-top_small">
+            </lightning-button>
+        </div>
+
+        <!-- GRID UI -->
+        <div class="slds-grid slds-wrap slds-p-around_medium">
+
+            <template for:each={animeList} for:item="anime">
+                <div key={anime.id} 
+                     class="slds-col slds-size_1-of-2 slds-p-around_small">
+
+                    <div class="slds-box">
+
+                        <img src={anime.image} width="100%" />
+
+                        <h3><b>{anime.title}</b></h3>
+
+                        <p>⭐ {anime.score}</p>
+                        <p>🎬 Episodes: {anime.episodes}</p>
+                        <p>Status: {anime.status}</p>
+
+                        <p class="slds-truncate">
+                            {anime.synopsis}
+                        </p>
+
+                    </div>
+
+                </div>
+            </template>
+
+        </div>
+
+    </lightning-card>
+</template>
