@@ -1,0 +1,19 @@
+{
+  "folders": [
+    {
+      "path": "/Users/bhuvnesh/Desktop/GitProjectsForSalesforce"
+    }
+  ],
+  "settings": {
+    "eslint.workingDirectories": [
+      "/Users/bhuvnesh/Desktop/GitProjectsForSalesforce"
+    ],
+    "eslint.validate": [
+      "javascript",
+      "typescript"
+    ],
+    "eslint.options": {
+      "overrideConfigFile": "/Users/bhuvnesh/Desktop/GitProjectsForSalesforce/.eslintrc.json"
+    }
+  }
+}

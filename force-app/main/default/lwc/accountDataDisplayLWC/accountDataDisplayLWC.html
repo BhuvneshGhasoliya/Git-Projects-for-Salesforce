@@ -1,0 +1,15 @@
+<template>
+    <template if:true={hasData}>
+        <div style="height: 300px;">
+            <lightning-datatable
+                key-field="Id"
+                data={accounts}
+                columns={columns}>
+            </lightning-datatable>
+        </div>
+    </template>
+
+    <template if:false={hasData}>
+        <p>No Data Found</p>
+    </template>
+</template>
